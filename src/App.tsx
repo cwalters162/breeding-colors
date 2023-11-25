@@ -35,7 +35,7 @@ function selectRandomPureColorPair(): Allele {
 
 function App() {
     const [totalLifeforms, setTotalLifeforms] = useState(10)
-    const [parents, setParents] = useState<Lifeform[]>(generateLifeforms(10));
+    const [currentGeneration, setCurrentGeneration] = useState<Lifeform[]>(generateLifeforms(10));
     const [firstParent, setFirstParent] = useState<Lifeform | null>(null)
     const [secondParent, setSecondParent] = useState<Lifeform | null>(null)
     const [child, setChild] = useState<Lifeform | null>(null)
@@ -53,15 +53,20 @@ function App() {
     }
 
     function handleParentOnClick(id: number) {
-        if (firstParent === null) {
-            setFirstParent(parents[id]);
-        } else if (secondParent === null) {
-            setSecondParent(parents[id]);
-        } else if (firstParent?.id === id) {
+        if (firstParent !== null && firstParent.id === id) {
             setFirstParent(null);
-        } else if (secondParent?.id === id) {
+            return
+        } else if (secondParent !== null && secondParent.id === id) {
             setSecondParent(null);
+            return
+        } else if (firstParent === null && secondParent === null) {
+            setFirstParent(currentGeneration[id]);
+            return
+        } else if ( firstParent !== null && secondParent === null) {
+            setSecondParent(currentGeneration[id]);
+            return
         }
+
     }
 
     function handleBreedOnClick() {
@@ -92,35 +97,30 @@ function App() {
             <div>
                 <h1>Welcome to Breeding Colors!</h1>
                 <p>Select two objects and click "breed" the child will then be shown at the bottom.</p>
-                   <div>
-                       <div>Colors</div>
-                       <div className={"bg-red-700 hover:bg-red-400"}>RED</div>
-                       <div className={"bg-green-700 hover:bg-green-400"}>GREEN</div>
-                       <div className={"bg-blue-700 hover:bg-blue-400"}>BLUE</div>
-                       <div className={"border-2 border-yellow-400"}>border gold</div>
-                   </div>
             </div>
-            <div>
-               <h1>Parents</h1>
-               <div className={"flex justify-center gap-4"}>
-               {parents.map((parent)=> {
-                   const bgColor = getBackgroundColor(parent.colorGene);
-                   let selectedBorder = "";
+            <div className={"flex justify-between px-4 border-2 border-black"}>
+                <div className={"flex flex-col border-r-2 border-black pr-2 pb-2"}>
+                   <h1>Parents</h1>
+                   <div className={"flex justify-center gap-4 pb-2"}>
+                   {currentGeneration.map((parent)=> {
+                       const bgColor = getBackgroundColor(parent.colorGene);
+                       let selectedBorder = "";
 
-                   if (parent.id === firstParent?.id || parent.id === secondParent?.id) {
-                       selectedBorder = "border-2 border-yellow-400"
-                   }
+                       if (parent.id === firstParent?.id || parent.id === secondParent?.id) {
+                           selectedBorder = "border-2 border-yellow-400"
+                       }
 
-                   return (<div key={parent.id} className={`min-w-[2rem] min-h-[2rem] ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`} onClick={() => handleParentOnClick(parent.id)}/>)
-               })}
+                       return (<div key={parent.id} className={`min-w-[2rem] min-h-[2rem] ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`} onClick={() => handleParentOnClick(parent.id)}/>)
+                   })}
+                   </div>
+                    <button className={"bg-gray-700 text-white rounded-2xl p-1"} onClick={() => handleBreedOnClick()}>BREED</button>
                </div>
-                <button className={"bg-gray-700 text-white rounded-2xl p-1"} onClick={() => handleBreedOnClick()}>BREED</button>
-           </div>
-            <div>
-                <h1>Child Result</h1>
-                {child && <div
-                    key={child.id}
-                    className={`min-w-[2rem] min-h-[2rem] ${getBackgroundColor(child.colorGene)}-700`}/>}
+                <div className={"flex flex-col border-l-2 border-black pl-2"}>
+                    <h1>Child Result</h1>
+                    {child && <div
+                        key={child.id}
+                        className={`min-w-[2rem] min-h-[2rem] ${getBackgroundColor(child.colorGene)}-700`}/>}
+                </div>
             </div>
    </div>
   )
