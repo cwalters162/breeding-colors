@@ -10,7 +10,7 @@ enum Gene {
 
 type Shape = {
     id: number
-    color: Gene
+    geneActive: Gene
     geneRecessive: Gene
 }
 
@@ -28,7 +28,7 @@ function generateShapes(amount: number) {
     for (let i = 0; i < amount; i++) {
         shapes.push({
             id: i,
-            color: selectRandomGene(),
+            geneActive: selectRandomGene(),
             geneRecessive: selectRandomGene(),
         })
     }
@@ -66,27 +66,27 @@ function App() {
             return
         }
 
-        if (firstParent.color === secondParent.color) {
+        if (firstParent.geneActive === secondParent.geneActive) {
             //recessive gene might take over active gene
 
             setChild({
                 id: firstParent.id + secondParent.id,
-                color: firstParent.color,
+                geneActive: firstParent.geneActive,
                 geneRecessive: firstParent.geneRecessive,
             })
         } else {
             const parentToInheritFrom = Math.floor(Math.random() * 2);
             console.log(parentToInheritFrom)
             switch (parentToInheritFrom) {
-                case 0: childActiveGene = firstParent.color; break;
-                case 1: childActiveGene = secondParent.color; break;
+                case 0: childActiveGene = firstParent.geneActive; break;
+                case 1: childActiveGene = secondParent.geneActive; break;
             }
 
             //which recessive gene take over?
 
             setChild({
                 id: firstParent.id + secondParent.id + 100,
-                color: childActiveGene,
+                geneActive: childActiveGene,
                 geneRecessive: firstParent.geneRecessive,
             })
         }
@@ -109,7 +109,7 @@ function App() {
                <h1>Parents</h1>
                <div className={"flex justify-center gap-4"}>
                {parents.map((parent)=> {
-                   const bgColor = getBackgroundColor(parent.color);
+                   const bgColor = getBackgroundColor(parent.geneActive);
                    let selectedBorder = "";
 
                    if (parent.id === firstParent?.id || parent.id === secondParent?.id) {
@@ -125,7 +125,7 @@ function App() {
                 <h1>Child Result</h1>
                 {child && <div
                     key={child.id}
-                    className={`min-w-[2rem] min-h-[2rem] ${getBackgroundColor(child.color)}-700`}/>}
+                    className={`min-w-[2rem] min-h-[2rem] ${getBackgroundColor(child.geneActive)}-700`}/>}
             </div>
    </div>
   )
