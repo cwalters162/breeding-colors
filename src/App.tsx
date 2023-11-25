@@ -34,15 +34,16 @@ function selectRandomPureColorPair(): Allele {
 }
 
 function App() {
-    const [totalLifeforms, setTotalLifeforms] = useState(10)
-    const [currentGeneration, setCurrentGeneration] = useState<Lifeform[]>(generateLifeforms(10));
+    const [totalLifeforms, setTotalLifeforms] = useState(0)
+    const [generations, setGenerations] = useState<Lifeform[][]>([generateLifeforms(10)])
+    const [currentGeneration, setCurrentGeneration] = useState<Lifeform[]>(generations[0]);
     const [firstParent, setFirstParent] = useState<Lifeform | null>(null)
     const [secondParent, setSecondParent] = useState<Lifeform | null>(null)
     const [child, setChild] = useState<Lifeform | null>(null)
 
     function generateLifeforms(amount: number) {
         const lifeforms: Lifeform[] = [];
-        for (let i = 0; i < amount; i++) {
+        for (let i = 1; i <= amount; i++) {
             lifeforms.push({
                 id: i,
                 colorGene: selectRandomPureColorPair(),
@@ -60,11 +61,21 @@ function App() {
             setSecondParent(null);
             return
         } else if (firstParent === null && secondParent === null) {
-            setFirstParent(currentGeneration[id]);
-            return
+            const result = currentGeneration.find(lifeform => lifeform.id === id)
+            if (result === undefined) {
+                return
+            } else {
+                setFirstParent(result);
+                return
+            }
         } else if ( firstParent !== null && secondParent === null) {
-            setSecondParent(currentGeneration[id]);
-            return
+            const result = currentGeneration.find(lifeform => lifeform.id === id)
+            if (result === undefined) {
+                return
+            } else {
+                setSecondParent(result);
+                return
+            }
         }
 
     }
@@ -109,7 +120,7 @@ function App() {
                        if (parent.id === firstParent?.id || parent.id === secondParent?.id) {
                            selectedBorder = "border-2 border-yellow-400"
                        }
-
+                        console.log(parent.id)
                        return (<div key={parent.id} className={`min-w-[2rem] min-h-[2rem] ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`} onClick={() => handleParentOnClick(parent.id)}/>)
                    })}
                    </div>
