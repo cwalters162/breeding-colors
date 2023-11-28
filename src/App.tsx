@@ -33,13 +33,23 @@ function selectRandomPureColorPair(): Allele {
     }
 }
 
+function CssSetup() {
+    return <>
+        <div className={"bg-green-700 hover:bg-green-400"}></div>
+        <div className={"bg-red-700 hover:bg-red-400"}></div>
+        <div className={"bg-blue-700 hover:bg-blue-400"}></div>
+    </>;
+}
+
 function App() {
-    const [totalLifeforms, setTotalLifeforms] = useState(0)
-    const [generations, setGenerations] = useState<Lifeform[][]>([generateLifeforms(10)])
-    const [currentGeneration, setCurrentGeneration] = useState<Lifeform[]>(generations[0]);
+    const [totalLifeforms, setTotalLifeforms] = useState(10)
+
+    const [generations, setGenerations] = useState<Lifeform[][]>([generateLifeforms(10), []])
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [currentGeneration, _setCurrentGeneration] = useState(0);
+
     const [firstParent, setFirstParent] = useState<Lifeform | null>(null)
     const [secondParent, setSecondParent] = useState<Lifeform | null>(null)
-    const [child, setChild] = useState<Lifeform | null>(null)
 
     function generateLifeforms(amount: number) {
         const lifeforms: Lifeform[] = [];
@@ -61,7 +71,7 @@ function App() {
             setSecondParent(null);
             return
         } else if (firstParent === null && secondParent === null) {
-            const result = currentGeneration.find(lifeform => lifeform.id === id)
+            const result = generations[currentGeneration].find(lifeform => lifeform.id === id)
             if (result === undefined) {
                 return
             } else {
@@ -69,7 +79,7 @@ function App() {
                 return
             }
         } else if ( firstParent !== null && secondParent === null) {
-            const result = currentGeneration.find(lifeform => lifeform.id === id)
+            const result = generations[currentGeneration].find(lifeform => lifeform.id === id)
             if (result === undefined) {
                 return
             } else {
@@ -81,6 +91,10 @@ function App() {
     }
 
     function handleBreedOnClick() {
+        if (generations[currentGeneration + 1].length >= 10) {
+            return
+        }
+
         let left: Color = Color.RED;
         let right: Color = Color.RED;
         const FirstParentSideToInheritFrom = Math.floor(Math.random() * 2);
@@ -95,45 +109,74 @@ function App() {
             case 1: left = firstParent.colorGene.right; break;
         }
         switch (SecondParentSideToInheritFrom) {
-            case 0: right = secondParent.colorGene.right; break;
+            case 0: right = secondParent.colorGene.left; break;
             case 1: right = secondParent.colorGene.right; break;
         }
-        const newChild = {id: totalLifeforms + 1, colorGene: {left, right},};
-        console.log(newChild.colorGene)
-        setChild(newChild);
+        const newChild = {
+            id: totalLifeforms + 1,
+            colorGene: {
+                left,
+                right
+            },
+        };
+
+        setTotalLifeforms(prevState => {
+            return prevState + 1;
+        })
+        setGenerations(prevState => {
+            const newGenerations = prevState.map(g => g.map(l => l));
+
+            if (!newGenerations[currentGeneration + 1]) {
+                newGenerations[currentGeneration + 1] = [];
+            }
+
+            newGenerations[currentGeneration + 1].push(newChild);
+
+            return newGenerations
+        })
     }
 
     return (
         <div className={"w-screen h-screen"}>
             <div>
+                <CssSetup/>
                 <h1>Welcome to Breeding Colors!</h1>
                 <p>Select two objects and click "breed" the child will then be shown at the bottom.</p>
             </div>
-            <div className={"flex justify-between px-4 border-2 border-black"}>
+            <div className={"flex px-4 border-2 border-black"}>
                 <div className={"flex flex-col border-r-2 border-black pr-2 pb-2"}>
-                   <h1>Parents</h1>
-                   <div className={"flex justify-center gap-4 pb-2"}>
-                   {currentGeneration.map((parent)=> {
-                       const bgColor = getBackgroundColor(parent.colorGene);
-                       let selectedBorder = "";
+                    <h1>Parents</h1>
+                    <div className={"flex justify-center gap-4 pb-2"}>
+                        {generations[currentGeneration].map((parent) => {
+                            const bgColor = getBackgroundColor(parent.colorGene);
+                            let selectedBorder = "";
 
-                       if (parent.id === firstParent?.id || parent.id === secondParent?.id) {
-                           selectedBorder = "border-2 border-yellow-400"
-                       }
-                        console.log(parent.id)
-                       return (<div key={parent.id} className={`min-w-[2rem] min-h-[2rem] ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`} onClick={() => handleParentOnClick(parent.id)}/>)
-                   })}
-                   </div>
-                    <button className={"bg-gray-700 text-white rounded-2xl p-1"} onClick={() => handleBreedOnClick()}>BREED</button>
-               </div>
-                <div className={"flex flex-col border-l-2 border-black pl-2"}>
+                            if (parent.id === firstParent?.id || parent.id === secondParent?.id) {
+                                selectedBorder = "border-2 border-yellow-400"
+                            }
+                            return (<div key={parent.id}
+                                         className={`min-w-[2rem] min-h-[2rem] ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`}
+                                         onClick={() => {return handleParentOnClick(parent.id)}}/>)
+                        })}
+                    </div>
+                    <button className={"bg-gray-700 text-white rounded-2xl p-1"}
+                            onClick={() => handleBreedOnClick()}>BREED
+                    </button>
+                </div>
+                <div className={"flex flex-col border-black pl-2"}>
                     <h1>Child Result</h1>
-                    {child && <div
-                        key={child.id}
-                        className={`min-w-[2rem] min-h-[2rem] ${getBackgroundColor(child.colorGene)}-700`}/>}
+                    <div className={"flex gap-4"}>
+                        {generations[currentGeneration + 1].map(child => {
+                            return (
+                                <div
+                                    key={child.id}
+                                    className={`min-w-[2rem] min-h-[2rem] ${getBackgroundColor(child.colorGene)}-700`}/>
+                            )
+                        })}
+                    </div>
                 </div>
             </div>
-   </div>
+        </div>
   )
 }
 
