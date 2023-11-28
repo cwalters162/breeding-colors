@@ -44,9 +44,8 @@ function CssSetup() {
 function App() {
     const [totalLifeforms, setTotalLifeforms] = useState(10)
 
-    const [generations, setGenerations] = useState<Lifeform[][]>([generateLifeforms(10), []])
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [currentGeneration, _setCurrentGeneration] = useState(0);
+    const [generations, setGenerations] = useState<Lifeform[][]>([generateLifeforms(10), []]);
+    const [currentGeneration, setCurrentGeneration] = useState(0);
 
     const [firstParent, setFirstParent] = useState<Lifeform | null>(null)
     const [secondParent, setSecondParent] = useState<Lifeform | null>(null)
@@ -136,6 +135,19 @@ function App() {
         })
     }
 
+    function handleNextGenerationOnClick() {
+
+        setCurrentGeneration(prevState => prevState+1)
+        setFirstParent(null)
+        setSecondParent(null)
+        setGenerations((prevState)=> {
+            const nextGenCreation = prevState.map(g => g.map(l => l));
+            nextGenCreation[currentGeneration+2] = [];
+
+            return nextGenCreation
+        })
+    }
+
     return (
         <div className={"w-screen h-screen"}>
             <div>
@@ -143,10 +155,13 @@ function App() {
                 <h1>Welcome to Breeding Colors!</h1>
                 <p>Select two objects and click "breed" the child will then be shown at the bottom.</p>
             </div>
-            <div className={"flex px-4 border-2 border-black"}>
-                <div className={"flex flex-col border-r-2 border-black pr-2 pb-2"}>
+            <div>
+                <span>Current Generation: {currentGeneration+1}</span>
+            </div>
+            <div className={"flex px-4 border-y-2 border-black justify-center"}>
+                <div className={"flex flex-col border-x-2 border-black px-2 gap-2 pb-2"}>
                     <h1>Parents</h1>
-                    <div className={"flex justify-center gap-4 pb-2"}>
+                    <div className={"flex justify-center gap-4 pb-2 flex-wrap"}>
                         {generations[currentGeneration].map((parent) => {
                             const bgColor = getBackgroundColor(parent.colorGene);
                             let selectedBorder = "";
@@ -163,10 +178,12 @@ function App() {
                             onClick={() => handleBreedOnClick()}>BREED
                     </button>
                 </div>
-                <div className={"flex flex-col border-black pl-2"}>
+                <div className={"flex flex-col border-black px-2 gap-2 border-r-2"}>
                     <h1>Child Result</h1>
-                    <div className={"flex gap-4"}>
-                        {generations[currentGeneration + 1].map(child => {
+                    <div className={"flex gap-4 pb-2 flex-wrap"}>
+                        {generations[currentGeneration + 1].length == 0 ?
+                            <div className={"min-w-[2rem] min-h-[2rem]"}/>
+                            : generations[currentGeneration + 1].map(child => {
                             return (
                                 <div
                                     key={child.id}
@@ -174,6 +191,7 @@ function App() {
                             )
                         })}
                     </div>
+                    <button className={"bg-gray-700 text-white rounded-2xl p-1"} onClick={handleNextGenerationOnClick}>Start next Generation</button>
                 </div>
             </div>
         </div>
