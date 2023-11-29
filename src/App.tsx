@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { SnackbarContext } from "./SnackBarContextProvider.tsx";
 enum Color {
 	RED = "R", // Red is Dominant over Blue
 	BLUE = "B", // Blue is Dominant over Green
@@ -57,6 +58,8 @@ function App() {
 
 	const [firstParent, setFirstParent] = useState<Lifeform | null>(null);
 	const [secondParent, setSecondParent] = useState<Lifeform | null>(null);
+
+	const snackBarCtx = useContext(SnackbarContext);
 
 	function generateLifeforms(amount: number) {
 		const lifeforms: Lifeform[] = [];
@@ -155,6 +158,10 @@ function App() {
 	}
 
 	function handleNextGenerationOnClick() {
+		if (generations[currentGeneration + 1].length < 10) {
+			snackBarCtx.displayMsg("You need 10 children for the next generation!");
+			return;
+		}
 		setCurrentGeneration((prevState) => prevState + 1);
 		setFirstParent(null);
 		setSecondParent(null);
@@ -238,13 +245,20 @@ function App() {
 						)}
 					</div>
 					<button
-						className={" w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
+						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
 						onClick={handleNextGenerationOnClick}
 					>
 						Start next Generation
 					</button>
 				</div>
 			</div>
+			{snackBarCtx.isDisplayed && (
+				<div className="fixed inset-x-0 bottom-0 flex justify-center pb-4">
+					<div className="rounded bg-yellow-600 p-4 text-white">
+						{snackBarCtx.msg}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
