@@ -173,13 +173,17 @@ function App() {
 				<h1>Welcome to Breeding Colors!</h1>
 				<p>
 					Select two objects and click "breed" the child will then be shown at
-					the bottom.
+					the bottom. Try to get all the colors!
 				</p>
 				<span>Current Generation: {currentGeneration + 1}</span>
 			</div>
-			<div className={"flex justify-center border-y-2 border-black px-4"}>
+			<div
+				className={"flex flex-col justify-center border-y-2 border-black px-4"}
+			>
 				<div
-					className={"flex flex-col gap-2 border-x-2 border-black px-2 pb-2 "}
+					className={
+						"flex flex-col items-center gap-2 border-x-2 border-b-2 border-black px-2 pb-2"
+					}
 				>
 					<h1>Parents</h1>
 					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
@@ -205,15 +209,19 @@ function App() {
 						})}
 					</div>
 					<button
-						className={"rounded-2xl bg-gray-700 p-1 text-white"}
+						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
 						onClick={() => handleBreedOnClick()}
 					>
 						BREED
 					</button>
 				</div>
-				<div className={"flex flex-col gap-2 border-r-2 border-black px-2"}>
+				<div
+					className={
+						"flex flex-col items-center gap-2 border-x-2 border-black px-2 pb-2"
+					}
+				>
 					<h1>Child Result</h1>
-					<div className={"flex flex-wrap gap-4 pb-2"}>
+					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
 						{generations[currentGeneration + 1].length == 0 ? (
 							<div className={"min-h-[2rem] min-w-[2rem]"} />
 						) : (
@@ -230,7 +238,7 @@ function App() {
 						)}
 					</div>
 					<button
-						className={"rounded-2xl bg-gray-700 p-1 text-white"}
+						className={" w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
 						onClick={handleNextGenerationOnClick}
 					>
 						Start next Generation
