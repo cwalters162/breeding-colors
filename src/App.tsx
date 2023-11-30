@@ -204,7 +204,7 @@ function App() {
 							);
 						})}
 					</div>
-					<div className={"flex flex-col gap-4 pt-2 sm:flex-row"}>
+					<div className={"flex flex-col-reverse gap-4 pt-2 sm:flex-row"}>
 						<Button
 							onClick={handlePreviousGeneration}
 							text={"Previous Generation"}
