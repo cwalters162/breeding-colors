@@ -232,12 +232,10 @@ function App() {
 								/>
 							);
 						}
-
+						console.log(getBackgroundColor(genome.color))
 						return (
 							<div
-								className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full bg-${getBackgroundColor(
-									genome.color,
-								)}-700`}
+								className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full ${getBackgroundColor(genome.color,)}-700`}
 							/>
 						);
 					})}
