@@ -1,6 +1,6 @@
-import { Color, selectRandomPureColorPair } from "./system/Genes/Color.ts";
-import { Allele, Genome } from "./system/Genes/Genome.ts";
-import { selectRandomMixColorGene } from "./system/Genes/MixColor.ts";
+import { Color, selectRandomPureColorPair } from "./Genes/Color.ts";
+import { Allele, Genome } from "./Genes/Genome.ts";
+import { selectRandomMixColorGene } from "./Genes/MixColor.ts";
 
 export type Lifeform = {
 	id: number;

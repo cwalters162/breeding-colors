@@ -5,7 +5,7 @@ import {
 	generateLifeforms,
 	getBackgroundColor,
 	Lifeform,
-} from "./Lifeform.tsx";
+} from "./system/Lifeform.tsx";
 import CssSetup from "./components/CssSetup.tsx";
 
 function App() {
