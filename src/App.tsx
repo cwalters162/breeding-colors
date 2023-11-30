@@ -1,83 +1,12 @@
 import { useState } from "react";
 import { useSnackbarContext } from "./SnackBarContextProvider.tsx";
-
-enum Color {
-	RED = "R", // Red is Dominant over Blue
-	BLUE = "B", // Blue is Dominant over Green
-	GREEN = "G", // Green is Hardest to Get
-}
-
-type Allele<T> = {
-	left: T;
-	right: T;
-};
-
-type Lifeform = {
-	id: number;
-	parents: number[];
-	genome: {
-		color: Allele<Color>;
-		mixColor: Allele<boolean>;
-	};
-};
-
-function selectRandomPureColorPair(): Allele<Color> {
-	const value = Math.floor(Math.random() * 3);
-	switch (value) {
-		case 0:
-			return {
-				left: Color.BLUE,
-				right: Color.BLUE,
-			};
-		case 1:
-			return {
-				left: Color.GREEN,
-				right: Color.GREEN,
-			};
-		default:
-			return {
-				left: Color.RED,
-				right: Color.RED,
-			};
-	}
-}
-
-function selectRandomMixColorGene(): Allele<boolean> {
-	const choice = Math.floor(Math.random() * 4);
-
-	switch (choice) {
-		case 0:
-			return {
-				left: true,
-				right: true,
-			};
-		case 1:
-			return {
-				left: true,
-				right: false,
-			};
-		case 2:
-			return {
-				left: false,
-				right: true,
-			};
-		default:
-			return {
-				left: false,
-				right: false,
-			};
-	}
-}
-
-function CssSetup() {
-	return (
-		<>
-			<div className={"bg-green-700 hover:bg-green-400"}></div>
-			<div className={"bg-red-700 hover:bg-red-400"}></div>
-			<div className={"bg-blue-700 hover:bg-blue-400"}></div>
-		</>
-	);
-}
+import {
+	breed,
+	generateLifeforms,
+	getBackgroundColor,
+	Lifeform,
+} from "./Lifeform.tsx";
+import CssSetup from "./components/CssSetup.tsx";
 
 function App() {
 	const [totalLifeforms, setTotalLifeforms] = useState(10);
@@ -92,22 +21,6 @@ function App() {
 	const [secondParent, setSecondParent] = useState<Lifeform | null>(null);
 
 	const snackBarCtx = useSnackbarContext();
-
-	function generateLifeforms(amount: number) {
-		const lifeforms: Lifeform[] = [];
-		for (let i = 1; i <= amount; i++) {
-			lifeforms.push({
-				id: i,
-				parents: [],
-				genome: {
-					color: selectRandomPureColorPair(),
-					mixColor: selectRandomMixColorGene(),
-				},
-			});
-		}
-
-		return lifeforms;
-	}
 
 	function handleParentOnClick(id: number) {
 		if (firstParent !== null && firstParent.id === id) {
@@ -139,57 +52,6 @@ function App() {
 		}
 	}
 
-	function crossover(
-		parentA: Lifeform,
-		parentB: Lifeform,
-		currentId: number,
-	): Lifeform {
-		let leftColor: Color = Color.RED;
-		let rightColor: Color = Color.RED;
-		let leftMixColor: boolean = false;
-		let rightMixColor: boolean = false;
-
-		const parentASideToInheritFrom = Math.floor(Math.random() * 2);
-		const parentBSideToInheritFrom = Math.floor(Math.random() * 2);
-
-		switch (parentASideToInheritFrom) {
-			case 0:
-				leftColor = parentA.genome.color.left;
-				leftMixColor = parentA.genome.mixColor.left;
-				break;
-			case 1:
-				leftColor = parentA.genome.color.right;
-				leftMixColor = parentA.genome.mixColor.right;
-				break;
-		}
-
-		switch (parentBSideToInheritFrom) {
-			case 0:
-				rightColor = parentB.genome.color.left;
-				rightMixColor = parentB.genome.mixColor.left;
-				break;
-			case 1:
-				rightColor = parentB.genome.color.right;
-				rightMixColor = parentB.genome.mixColor.right;
-				break;
-		}
-
-		return {
-			id: currentId + 1,
-			parents: [parentA.id, parentB.id],
-			genome: {
-				color: {
-					left: leftColor,
-					right: rightColor,
-				},
-				mixColor: {
-					left: leftMixColor,
-					right: rightMixColor,
-				},
-			},
-		};
-	}
-
 	function handleBreedOnClick() {
 		if (generations[currentGeneration + 1].length >= 10) {
 			return;
@@ -199,7 +61,7 @@ function App() {
 			return;
 		}
 
-		const newChild = crossover(firstParent, secondParent, totalLifeforms);
+		const newChild = breed(firstParent, secondParent, totalLifeforms);
 
 		setTotalLifeforms((prevState) => {
 			return prevState + 1;
@@ -321,20 +183,6 @@ function App() {
 			)}
 		</div>
 	);
-}
-
-function getBackgroundColor(allele: Allele<Color>) {
-	const left = allele.left;
-	const right = allele.right;
-	if (left === Color.RED || right === Color.RED) {
-		return "bg-red";
-	}
-	if (left === Color.BLUE || right === Color.BLUE) {
-		return "bg-blue";
-	}
-	if (left === Color.GREEN && right === Color.GREEN) {
-		return "bg-green";
-	}
 }
 
 export default App;
