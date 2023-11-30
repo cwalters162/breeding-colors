@@ -95,6 +95,17 @@ function App() {
 		});
 	}
 
+	function handlePreviousGeneration() {
+		if (currentGeneration === 0) {
+			snackBarCtx.displayMsg("Cannot go back anymore generations!");
+			return;
+		}
+
+		setCurrentGeneration((prevState) => prevState - 1);
+		setFirstParent(null);
+		setSecondParent(null);
+	}
+
 	return (
 		<div className={"h-screen w-screen"}>
 			<div className={"flex w-full flex-col justify-center text-center"}>
@@ -170,7 +181,13 @@ function App() {
 						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
 						onClick={handleNextGenerationOnClick}
 					>
-						Start next Generation
+						Next Generation
+					</button>
+					<button
+						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
+						onClick={handlePreviousGeneration}
+					>
+						Previous Generation
 					</button>
 				</div>
 			</div>
