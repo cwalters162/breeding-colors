@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-	SnackbarContext,
-	useSnackbarContext,
-} from "./SnackBarContextProvider.tsx";
+import { useSnackbarContext } from "./SnackBarContextProvider.tsx";
 import {
 	breed,
 	generateLifeforms,
@@ -11,6 +8,7 @@ import {
 } from "./system/Lifeform.ts";
 import CssSetup from "./components/CssSetup.tsx";
 import Button from "./components/Button.tsx";
+import QuestionMark from "./assets/QuestionMark.svg";
 
 function App() {
 	const [totalLifeforms, setTotalLifeforms] = useState(10);
@@ -24,16 +22,24 @@ function App() {
 	const [firstParent, setFirstParent] = useState<Lifeform | null>(null);
 	const [secondParent, setSecondParent] = useState<Lifeform | null>(null);
 
+	const [discoveredColors, setDiscoveredColors] = useState(
+		Array.from(Array(10).fill(false)),
+	);
+
 	const snackBarCtx = useSnackbarContext();
 
 	function handleParentOnClick(id: number) {
 		if (firstParent !== null && firstParent.id === id) {
 			setFirstParent(null);
 			return;
-		} else if (secondParent !== null && secondParent.id === id) {
+		}
+
+		if (secondParent !== null && secondParent.id === id) {
 			setSecondParent(null);
 			return;
-		} else if (firstParent === null && secondParent === null) {
+		}
+
+		if (firstParent === null) {
 			const result = generations[currentGeneration].find(
 				(lifeform) => lifeform.id === id,
 			);
@@ -43,7 +49,9 @@ function App() {
 				setFirstParent(result);
 				return;
 			}
-		} else if (firstParent !== null && secondParent === null) {
+		}
+
+		if (secondParent === null) {
 			const result = generations[currentGeneration].find(
 				(lifeform) => lifeform.id === id,
 			);
@@ -114,7 +122,9 @@ function App() {
 	return (
 		<div className={"h-screen w-screen bg-black"}>
 			<div
-				className={"flex w-full flex-col justify-center text-center text-white"}
+				className={
+					"flex w-full flex-col justify-center px-2 text-center text-white"
+				}
 			>
 				<CssSetup />
 				<h1>Welcome to Breeding Colors!</h1>
@@ -126,7 +136,7 @@ function App() {
 			</div>
 			<div className={"flex flex-col justify-center px-4"}>
 				<div className={"flex flex-col items-center gap-2 px-2 pb-2"}>
-					<h1>Parents</h1>
+					<h1 className={"text-white"}>Parents</h1>
 					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
 						{generations[currentGeneration].map((parent) => {
 							const bgColor = getBackgroundColor(parent.genome.color);
@@ -152,24 +162,20 @@ function App() {
 					<Button onClick={handleBreedOnClick} text={"Breed"} />
 				</div>
 				<div className={"flex flex-col items-center gap-2 px-2 pb-2"}>
-					<h1>Child Result</h1>
-					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
-						{generations[currentGeneration + 1].length == 0 ? (
-							<div className={"min-h-[2rem] min-w-[2rem]"} />
-						) : (
-							generations[currentGeneration + 1].map((child) => {
-								return (
-									<div
-										key={child.id}
-										className={`min-h-[2rem] min-w-[2rem] rounded-full ${getBackgroundColor(
-											child.genome.color,
-										)}-700`}
-									/>
-								);
-							})
-						)}
+					<h1 className={"text-white"}>Children</h1>
+					<div className={"flex min-h-[5rem] flex-wrap justify-center gap-4"}>
+						{generations[currentGeneration + 1].map((child) => {
+							return (
+								<div
+									key={child.id}
+									className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full ${getBackgroundColor(
+										child.genome.color,
+									)}-700`}
+								/>
+							);
+						})}
 					</div>
-					<div className={"flex flex-col gap-4 sm:flex-row"}>
+					<div className={"flex flex-col gap-4 pt-2 sm:flex-row"}>
 						<Button
 							onClick={handlePreviousGeneration}
 							text={"Previous Generation"}
@@ -179,6 +185,31 @@ function App() {
 							text={"Next Generation"}
 						/>
 					</div>
+				</div>
+			</div>
+			<div className={"flex flex-col items-center text-white"}>
+				<h2 className={"text-white"}>Discovered Colors</h2>
+				<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
+					{discoveredColors.map((isDiscovered, index) => {
+						if (!isDiscovered) {
+							return (
+								<img
+									key={`${index}-${isDiscovered}`}
+									src={QuestionMark}
+									alt={"Question Mark"}
+									width={32}
+									height={32}
+									className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full border-2 border-gray-400`}
+								/>
+							);
+						}
+
+						return (
+							<div
+								className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full bg-red-700`}
+							/>
+						);
+					})}
 				</div>
 			</div>
 			{snackBarCtx.isDisplayed && (
