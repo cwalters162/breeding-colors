@@ -33,3 +33,19 @@ export function selectRandomPureColorPair(): Allele<Color> {
 			};
 	}
 }
+
+export function selectMixedColor(allele: Allele<Color>): MixedColor {
+	if (
+		(allele.left === Color.RED && allele.right === Color.GREEN) ||
+		(allele.left === Color.GREEN && allele.right === Color.RED)
+	) {
+		return MixedColor.YELLOW;
+	}
+	if (
+		(allele.left === Color.RED && allele.right === Color.BLUE) ||
+		(allele.left === Color.BLUE && allele.right === Color.RED)
+	) {
+		return MixedColor.PURPLE;
+	}
+	return MixedColor.TEAL;
+}

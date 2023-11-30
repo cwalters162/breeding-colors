@@ -9,6 +9,7 @@ import {
 import CssSetup from "./components/CssSetup.tsx";
 import Button from "./components/Button.tsx";
 import QuestionMark from "./assets/QuestionMark.svg";
+import { baseLineDiscoveries, Genome } from "./system/Genes/Genome.ts";
 
 function App() {
 	const [totalLifeforms, setTotalLifeforms] = useState(10);
@@ -22,9 +23,9 @@ function App() {
 	const [firstParent, setFirstParent] = useState<Lifeform | null>(null);
 	const [secondParent, setSecondParent] = useState<Lifeform | null>(null);
 
-	const [discoveredColors, setDiscoveredColors] = useState(
-		Array.from(Array(10).fill(false)),
-	);
+	const [discoveredColors, setDiscoveredColors] = useState<(Genome | null)[]>([
+		...baseLineDiscoveries,
+	]);
 
 	const snackBarCtx = useSnackbarContext();
 
@@ -75,6 +76,7 @@ function App() {
 		}
 
 		const newChild = breed(firstParent, secondParent, totalLifeforms);
+		handleDiscoveredNewColor(newChild, discoveredColors);
 
 		setTotalLifeforms((prevState) => {
 			return prevState + 1;
@@ -117,6 +119,33 @@ function App() {
 		setCurrentGeneration((prevState) => prevState - 1);
 		setFirstParent(null);
 		setSecondParent(null);
+	}
+
+	function handleDiscoveredNewColor(
+		newLifeform: Lifeform,
+		currentDiscoveries: (Genome | null)[],
+	) {
+		const result = currentDiscoveries.findIndex(
+			(genome) => newLifeform.genome === genome,
+		);
+
+		if (result !== -1) {
+			return;
+		}
+		//find an empty slot
+		const emptySlot = currentDiscoveries.findIndex(
+			(element) => element === null,
+		);
+		if (emptySlot === -1) {
+			snackBarCtx.displayMsg("No empty Discovery Slots");
+		}
+
+		const newDiscoveries = [...currentDiscoveries];
+		newDiscoveries[emptySlot] = newLifeform.genome;
+
+		setDiscoveredColors(newDiscoveries);
+
+		return;
 	}
 
 	return (
@@ -190,11 +219,11 @@ function App() {
 			<div className={"flex flex-col items-center gap-4 text-white"}>
 				<h1 className={"text-white"}>Discovered Colors</h1>
 				<div className={"flex flex-wrap justify-center gap-4 px-2"}>
-					{discoveredColors.map((isDiscovered, index) => {
-						if (!isDiscovered) {
+					{discoveredColors.map((genome, index) => {
+						if (!genome) {
 							return (
 								<img
-									key={`${index}-${isDiscovered}`}
+									key={`discovery-${index}`}
 									src={QuestionMark}
 									alt={"Question Mark"}
 									width={32}
@@ -206,7 +235,9 @@ function App() {
 
 						return (
 							<div
-								className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full bg-red-700`}
+								className={`max-h-[2rem] min-h-[2rem] min-w-[2rem] rounded-full bg-${getBackgroundColor(
+									genome.color,
+								)}-700`}
 							/>
 						);
 					})}
