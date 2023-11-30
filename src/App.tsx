@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useSnackbarContext } from "./SnackBarContextProvider.tsx";
+import {
+	SnackbarContext,
+	useSnackbarContext,
+} from "./SnackBarContextProvider.tsx";
 import {
 	breed,
 	generateLifeforms,
@@ -7,6 +10,7 @@ import {
 	Lifeform,
 } from "./system/Lifeform.ts";
 import CssSetup from "./components/CssSetup.tsx";
+import Button from "./components/Button.tsx";
 
 function App() {
 	const [totalLifeforms, setTotalLifeforms] = useState(10);
@@ -58,6 +62,7 @@ function App() {
 		}
 
 		if (!firstParent || !secondParent) {
+			snackBarCtx.displayMsg("Must have two parents selected to breed!");
 			return;
 		}
 
@@ -107,8 +112,10 @@ function App() {
 	}
 
 	return (
-		<div className={"h-screen w-screen"}>
-			<div className={"flex w-full flex-col justify-center text-center"}>
+		<div className={"h-screen w-screen bg-black"}>
+			<div
+				className={"flex w-full flex-col justify-center text-center text-white"}
+			>
 				<CssSetup />
 				<h1>Welcome to Breeding Colors!</h1>
 				<p>
@@ -117,14 +124,8 @@ function App() {
 				</p>
 				<span>Current Generation: {currentGeneration + 1}</span>
 			</div>
-			<div
-				className={"flex flex-col justify-center border-y-2 border-black px-4"}
-			>
-				<div
-					className={
-						"flex flex-col items-center gap-2 border-x-2 border-b-2 border-black px-2 pb-2"
-					}
-				>
+			<div className={"flex flex-col justify-center px-4"}>
+				<div className={"flex flex-col items-center gap-2 px-2 pb-2"}>
 					<h1>Parents</h1>
 					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
 						{generations[currentGeneration].map((parent) => {
@@ -140,7 +141,7 @@ function App() {
 							return (
 								<div
 									key={parent.id}
-									className={`min-h-[2rem] min-w-[2rem] ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`}
+									className={` min-h-[2rem] min-w-[2rem] rounded-full ${bgColor}-700 hover:${bgColor}-400 ${selectedBorder}`}
 									onClick={() => {
 										return handleParentOnClick(parent.id);
 									}}
@@ -148,18 +149,9 @@ function App() {
 							);
 						})}
 					</div>
-					<button
-						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
-						onClick={() => handleBreedOnClick()}
-					>
-						BREED
-					</button>
+					<Button onClick={handleBreedOnClick} text={"Breed"} />
 				</div>
-				<div
-					className={
-						"flex flex-col items-center gap-2 border-x-2 border-black px-2 pb-2"
-					}
-				>
+				<div className={"flex flex-col items-center gap-2 px-2 pb-2"}>
 					<h1>Child Result</h1>
 					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
 						{generations[currentGeneration + 1].length == 0 ? (
@@ -169,7 +161,7 @@ function App() {
 								return (
 									<div
 										key={child.id}
-										className={`min-h-[2rem] min-w-[2rem] ${getBackgroundColor(
+										className={`min-h-[2rem] min-w-[2rem] rounded-full ${getBackgroundColor(
 											child.genome.color,
 										)}-700`}
 									/>
@@ -177,18 +169,16 @@ function App() {
 							})
 						)}
 					</div>
-					<button
-						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
-						onClick={handleNextGenerationOnClick}
-					>
-						Next Generation
-					</button>
-					<button
-						className={"w-1/2 rounded-2xl bg-gray-700 p-1 text-white"}
-						onClick={handlePreviousGeneration}
-					>
-						Previous Generation
-					</button>
+					<div className={"flex flex-col gap-4 sm:flex-row"}>
+						<Button
+							onClick={handlePreviousGeneration}
+							text={"Previous Generation"}
+						/>
+						<Button
+							onClick={handleNextGenerationOnClick}
+							text={"Next Generation"}
+						/>
+					</div>
 				</div>
 			</div>
 			{snackBarCtx.isDisplayed && (
