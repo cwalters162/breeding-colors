@@ -1,23 +1,28 @@
-import { useContext, useState } from "react";
-import { SnackbarContext } from "./SnackBarContextProvider.tsx";
+import { useState } from "react";
+import { useSnackbarContext } from "./SnackBarContextProvider.tsx";
+
 enum Color {
 	RED = "R", // Red is Dominant over Blue
 	BLUE = "B", // Blue is Dominant over Green
 	GREEN = "G", // Green is Hardest to Get
 }
 
-type Allele = {
-	left: Color;
-	right: Color;
+type Allele<T> = {
+	left: T;
+	right: T;
 };
 
 type Lifeform = {
 	id: number;
-	colorGene: Allele;
+	parents: number[];
+	genome: {
+		color: Allele<Color>;
+		mixColor: Allele<boolean>;
+	};
 };
 
-function selectRandomPureColorPair(): Allele {
-	const value = Math.floor(Math.random() * 4);
+function selectRandomPureColorPair(): Allele<Color> {
+	const value = Math.floor(Math.random() * 3);
 	switch (value) {
 		case 0:
 			return {
@@ -33,6 +38,33 @@ function selectRandomPureColorPair(): Allele {
 			return {
 				left: Color.RED,
 				right: Color.RED,
+			};
+	}
+}
+
+function selectRandomMixColorGene(): Allele<boolean> {
+	const choice = Math.floor(Math.random() * 4);
+
+	switch (choice) {
+		case 0:
+			return {
+				left: true,
+				right: true,
+			};
+		case 1:
+			return {
+				left: true,
+				right: false,
+			};
+		case 2:
+			return {
+				left: false,
+				right: true,
+			};
+		default:
+			return {
+				left: false,
+				right: false,
 			};
 	}
 }
@@ -59,14 +91,18 @@ function App() {
 	const [firstParent, setFirstParent] = useState<Lifeform | null>(null);
 	const [secondParent, setSecondParent] = useState<Lifeform | null>(null);
 
-	const snackBarCtx = useContext(SnackbarContext);
+	const snackBarCtx = useSnackbarContext();
 
 	function generateLifeforms(amount: number) {
 		const lifeforms: Lifeform[] = [];
 		for (let i = 1; i <= amount; i++) {
 			lifeforms.push({
 				id: i,
-				colorGene: selectRandomPureColorPair(),
+				parents: [],
+				genome: {
+					color: selectRandomPureColorPair(),
+					mixColor: selectRandomMixColorGene(),
+				},
 			});
 		}
 
@@ -103,43 +139,67 @@ function App() {
 		}
 	}
 
+	function crossover(
+		parentA: Lifeform,
+		parentB: Lifeform,
+		currentId: number,
+	): Lifeform {
+		let leftColor: Color = Color.RED;
+		let rightColor: Color = Color.RED;
+		let leftMixColor: boolean = false;
+		let rightMixColor: boolean = false;
+
+		const parentASideToInheritFrom = Math.floor(Math.random() * 2);
+		const parentBSideToInheritFrom = Math.floor(Math.random() * 2);
+
+		switch (parentASideToInheritFrom) {
+			case 0:
+				leftColor = parentA.genome.color.left;
+				leftMixColor = parentA.genome.mixColor.left;
+				break;
+			case 1:
+				leftColor = parentA.genome.color.right;
+				leftMixColor = parentA.genome.mixColor.right;
+				break;
+		}
+
+		switch (parentBSideToInheritFrom) {
+			case 0:
+				rightColor = parentB.genome.color.left;
+				rightMixColor = parentB.genome.mixColor.left;
+				break;
+			case 1:
+				rightColor = parentB.genome.color.right;
+				rightMixColor = parentB.genome.mixColor.right;
+				break;
+		}
+
+		return {
+			id: currentId + 1,
+			parents: [parentA.id, parentB.id],
+			genome: {
+				color: {
+					left: leftColor,
+					right: rightColor,
+				},
+				mixColor: {
+					left: leftMixColor,
+					right: rightMixColor,
+				},
+			},
+		};
+	}
+
 	function handleBreedOnClick() {
 		if (generations[currentGeneration + 1].length >= 10) {
 			return;
 		}
 
-		let left: Color = Color.RED;
-		let right: Color = Color.RED;
-		const FirstParentSideToInheritFrom = Math.floor(Math.random() * 2);
-		const SecondParentSideToInheritFrom = Math.floor(Math.random() * 2);
-
 		if (!firstParent || !secondParent) {
 			return;
 		}
 
-		switch (FirstParentSideToInheritFrom) {
-			case 0:
-				left = firstParent.colorGene.left;
-				break;
-			case 1:
-				left = firstParent.colorGene.right;
-				break;
-		}
-		switch (SecondParentSideToInheritFrom) {
-			case 0:
-				right = secondParent.colorGene.left;
-				break;
-			case 1:
-				right = secondParent.colorGene.right;
-				break;
-		}
-		const newChild = {
-			id: totalLifeforms + 1,
-			colorGene: {
-				left,
-				right,
-			},
-		};
+		const newChild = crossover(firstParent, secondParent, totalLifeforms);
 
 		setTotalLifeforms((prevState) => {
 			return prevState + 1;
@@ -195,7 +255,7 @@ function App() {
 					<h1>Parents</h1>
 					<div className={"flex flex-wrap justify-center gap-4 pb-2"}>
 						{generations[currentGeneration].map((parent) => {
-							const bgColor = getBackgroundColor(parent.colorGene);
+							const bgColor = getBackgroundColor(parent.genome.color);
 							let selectedBorder = "";
 
 							if (
@@ -237,7 +297,7 @@ function App() {
 									<div
 										key={child.id}
 										className={`min-h-[2rem] min-w-[2rem] ${getBackgroundColor(
-											child.colorGene,
+											child.genome.color,
 										)}-700`}
 									/>
 								);
@@ -263,7 +323,7 @@ function App() {
 	);
 }
 
-function getBackgroundColor(allele: Allele) {
+function getBackgroundColor(allele: Allele<Color>) {
 	const left = allele.left;
 	const right = allele.right;
 	if (left === Color.RED || right === Color.RED) {

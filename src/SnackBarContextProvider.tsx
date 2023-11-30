@@ -1,14 +1,29 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useContext, useState } from "react";
 
-export const SnackbarContext = React.createContext({
-	msg: "",
-	isDisplayed: false,
-	displayMsg: (msg: string) => {},
-	onClose: (timer: number) => {},
-});
+interface ISnackbarContext {
+	msg: string;
+	isDisplayed: boolean;
+	displayMsg: (msg: string) => void;
+	onClose: (timer: number) => void;
+}
+
+export const SnackbarContext = React.createContext<
+	ISnackbarContext | undefined
+>(undefined);
 
 interface SnackBarContextProps {
 	children: ReactElement;
+}
+
+export function useSnackbarContext() {
+	const context = useContext(SnackbarContext);
+	if (context === undefined) {
+		throw new Error(
+			"useSnackbarContext must be withing SnackBarContextProvider",
+		);
+	}
+
+	return context;
 }
 
 export function SnackBarContextProvider(props: SnackBarContextProps) {
