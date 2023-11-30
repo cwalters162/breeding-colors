@@ -6,6 +6,13 @@ export enum Color {
 	GREEN = "G", // Green is Hardest to Get
 }
 
+//Will only show when the mixColor gene is both true
+export enum MixedColor {
+	YELLOW = "Y",
+	PURPLE = "P",
+	TEAL = "T",
+}
+
 export function selectRandomPureColorPair(): Allele<Color> {
 	const value = Math.floor(Math.random() * 3);
 	switch (value) {

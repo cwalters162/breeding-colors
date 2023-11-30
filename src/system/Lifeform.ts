@@ -62,14 +62,32 @@ export function breed(
 export function getBackgroundColor(allele: Allele<Color>) {
 	const left = allele.left;
 	const right = allele.right;
-	if (left === Color.RED || right === Color.RED) {
+	if (left === Color.RED && right === Color.RED) {
 		return "bg-red";
 	}
-	if (left === Color.BLUE || right === Color.BLUE) {
+	if (left === Color.BLUE && right === Color.BLUE) {
 		return "bg-blue";
 	}
 	if (left === Color.GREEN && right === Color.GREEN) {
 		return "bg-green";
+	}
+	if (
+		(left === Color.RED && right === Color.BLUE) ||
+		(left === Color.BLUE && right === Color.RED)
+	) {
+		return "bg-purple";
+	}
+	if (
+		(left === Color.RED && right === Color.GREEN) ||
+		(left === Color.GREEN && right === Color.RED)
+	) {
+		return "bg-yellow";
+	}
+	if (
+		(left === Color.BLUE && right === Color.GREEN) ||
+		(left === Color.GREEN && right === Color.BLUE)
+	) {
+		return "bg-teal";
 	}
 }
 
