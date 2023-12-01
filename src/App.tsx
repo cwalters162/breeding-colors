@@ -8,12 +8,12 @@ import {
 } from "./system/Lifeform.ts";
 import CssSetup from "./components/CssSetup.tsx";
 import Button from "./components/Button.tsx";
-import QuestionMark from "./assets/QuestionMark.svg";
 import {
 	baseLineDiscoveries,
 	Genome,
 	isGenomeEqual,
 } from "./system/Genes/Genome.ts";
+import DiscoverySection from "./components/DiscoverySection.tsx";
 
 function App() {
 	const [totalLifeforms, setTotalLifeforms] = useState(8);
@@ -27,9 +27,9 @@ function App() {
 	const [firstParent, setFirstParent] = useState<Lifeform | null>(null);
 	const [secondParent, setSecondParent] = useState<Lifeform | null>(null);
 
-	const [discoveredColors, setDiscoveredColors] = useState<(Genome | null)[]>([
-		...baseLineDiscoveries,
-	]);
+	const [discoveredCombinations, setDiscoveredCombinations] = useState<
+		(Genome | null)[]
+	>([...baseLineDiscoveries]);
 
 	const snackBarCtx = useSnackbarContext();
 
@@ -80,7 +80,7 @@ function App() {
 		}
 
 		const newChild = breed(firstParent, secondParent, totalLifeforms);
-		handleDiscoveredNewColor(newChild, discoveredColors);
+		handleDiscoveredNewColor(newChild, discoveredCombinations);
 
 		setTotalLifeforms((prevState) => {
 			return prevState + 1;
@@ -152,7 +152,7 @@ function App() {
 		const newDiscoveries = [...currentDiscoveries];
 		newDiscoveries[emptySlot] = newLifeform.genome;
 
-		setDiscoveredColors(newDiscoveries);
+		setDiscoveredCombinations(newDiscoveries);
 
 		return;
 	}
@@ -251,39 +251,7 @@ function App() {
 					</div>
 				)}
 			</div>
-			<div className={"h-screen w-screen bg-gray-900"}>
-				<div
-					className={"flex flex-col items-center gap-4 px-2 pt-2 text-white"}
-				>
-					<h1 className={"text-white"}>Discovered Combinations</h1>
-					<div
-						className={"flex max-w-[16rem] flex-wrap justify-center gap-4 px-2"}
-					>
-						{discoveredColors.map((genome, index) => {
-							if (!genome) {
-								return (
-									<img
-										key={`discovery-${index}`}
-										src={QuestionMark}
-										alt={"Question Mark"}
-										width={32}
-										height={32}
-										className={`max-h-[2.5rem] min-h-[2.5rem] min-w-[2.5rem] rounded-full border-2 border-gray-400`}
-									/>
-								);
-							}
-							return (
-								<div
-									key={`${genome.color.left}-${genome.color.right}-${genome.mixColor.left}-${genome.mixColor.right}`}
-									className={`min-h-[2.5rem] min-w-[2.5rem] rounded-full ${getBackgroundColor(
-										genome.color,
-									)}-700`}
-								/>
-							);
-						})}
-					</div>
-				</div>
-			</div>
+			<DiscoverySection discoveredCombinations={discoveredCombinations} />
 		</div>
 	);
 }
