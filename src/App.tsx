@@ -14,6 +14,7 @@ import {
 	isGenomeEqual,
 } from "./system/Genes/Genome.ts";
 import DiscoverySection from "./components/DiscoverySection.tsx";
+import ChildrenSection from "./components/ChildrenSection.tsx";
 
 function App() {
 	const [totalLifeforms, setTotalLifeforms] = useState(8);
@@ -204,34 +205,23 @@ function App() {
 						</div>
 						<Button onClick={handleBreedOnClick} text={"Breed"} />
 					</div>
-					<div className={"flex flex-col items-center gap-2 px-2 pb-2"}>
-						<h1 className={"text-white"}>Children</h1>
-						<div
-							className={
-								"flex min-h-[6rem] max-w-[16rem] flex-wrap justify-center gap-4"
-							}
-						>
-							{generations[currentGeneration + 1].map((child) => {
-								return (
-									<div
-										key={child.id}
-										className={`max-h-[2.5rem] min-h-[2.5rem] min-w-[2.5rem] rounded-full ${getBackgroundColor(
-											child.genome.color,
-										)}-700`}
-									/>
-								);
-							})}
-						</div>
-						<div className={"flex flex-col-reverse gap-4 pt-2 sm:flex-row"}>
-							<Button
-								onClick={handlePreviousGeneration}
-								text={"Previous Generation"}
-							/>
-							<Button
-								onClick={handleNextGenerationOnClick}
-								text={"Next Generation"}
-							/>
-						</div>
+					<ChildrenSection
+						generations={generations}
+						currentGeneration={currentGeneration}
+					/>
+					<div
+						className={
+							"flex flex-col-reverse items-center gap-4 pt-2 sm:flex-row sm:justify-center"
+						}
+					>
+						<Button
+							onClick={handlePreviousGeneration}
+							text={"Previous Generation"}
+						/>
+						<Button
+							onClick={handleNextGenerationOnClick}
+							text={"Next Generation"}
+						/>
 					</div>
 				</div>
 				<div>
