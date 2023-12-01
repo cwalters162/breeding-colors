@@ -44,4 +44,42 @@ export const baseLineDiscoveries: (Genome | null)[] = [
 	null,
 	null,
 	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
+	null,
 ];
+
+export function isGenomeEqual(a: Genome, b: Genome) {
+	const aColor = Object.values(a.color);
+	const bColor = Object.values(b.color);
+
+	const aMixColor = Object.values(a.mixColor);
+	const bMixColor = Object.values(b.mixColor);
+
+	for (let i = 0; i < aColor.length; i++) {
+		if (aColor[i] != bColor[i]) {
+			return false;
+		}
+	}
+	for (let i = 0; i < aMixColor.length; i++) {
+		if (aMixColor[i] != bMixColor[i]) {
+			return false;
+		}
+	}
+	return true;
+}
