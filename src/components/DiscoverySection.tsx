@@ -1,13 +1,18 @@
 import QuestionMark from "../assets/QuestionMark.svg";
 import { getBackgroundColor } from "../system/Lifeform.ts";
 import { Genome } from "../system/Genes/Genome.ts";
+import SelectedDiscoverySection from "./SelectedDiscoveryContent.tsx";
 
 interface DiscoverySectionProps {
 	discoveredCombinations: (Genome | null)[];
+	onClick: (genome: Genome) => void;
+	selectedDiscovery: Genome | null;
 }
 
 export default function DiscoverySection({
 	discoveredCombinations,
+	onClick,
+	selectedDiscovery,
 }: DiscoverySectionProps) {
 	return (
 		<div className={"h-screen w-screen bg-gray-900"}>
@@ -35,11 +40,15 @@ export default function DiscoverySection({
 								className={`min-h-[2.5rem] min-w-[2.5rem] rounded-full ${getBackgroundColor(
 									genome.color,
 								)}-700`}
+								onClick={() => onClick(genome)}
 							/>
 						);
 					})}
 				</div>
 			</div>
+			{selectedDiscovery && (
+				<SelectedDiscoverySection selectedDiscovery={selectedDiscovery} />
+			)}
 		</div>
 	);
 }

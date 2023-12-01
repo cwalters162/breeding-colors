@@ -32,6 +32,10 @@ function App() {
 		(Genome | null)[]
 	>([...baseLineDiscoveries]);
 
+	const [selectedDiscovery, setSelectedDiscovery] = useState<Genome | null>(
+		null,
+	);
+
 	const snackBarCtx = useSnackbarContext();
 
 	function handleParentOnClick(id: number) {
@@ -158,6 +162,18 @@ function App() {
 		return;
 	}
 
+	function handleDiscoveryOnClick(genome: Genome) {
+		if (selectedDiscovery === null) {
+			setSelectedDiscovery(genome);
+			return;
+		} else if (isGenomeEqual(genome, selectedDiscovery)) {
+			setSelectedDiscovery(null);
+			return;
+		} else {
+			setSelectedDiscovery(genome);
+		}
+	}
+
 	return (
 		<div>
 			<div className={"h-screen w-screen bg-black"}>
@@ -241,7 +257,11 @@ function App() {
 					</div>
 				)}
 			</div>
-			<DiscoverySection discoveredCombinations={discoveredCombinations} />
+			<DiscoverySection
+				discoveredCombinations={discoveredCombinations}
+				onClick={handleDiscoveryOnClick}
+				selectedDiscovery={selectedDiscovery}
+			/>
 		</div>
 	);
 }
