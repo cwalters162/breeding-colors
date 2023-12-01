@@ -106,3 +106,41 @@ export function generateLifeforms(amount: number) {
 
 	return lifeforms;
 }
+
+export function mutateLifeform(lifeform: Lifeform) {
+	const geneToMutate = Math.floor(Math.random() * 2);
+
+	switch (geneToMutate) {
+		case 0: mutateColor(lifeform); break;
+		case 1: mutateMixColor(lifeform); break;
+	}
+}
+
+export function mutateColor(lifeform: Lifeform) {
+	const colorToUse = Math.floor(Math.random() * 3)
+	const sideToUse = Math.floor(Math.random() * 3)
+	let color = Color.RED;
+
+	switch (colorToUse) {
+		case 0: color = Color.BLUE; break;
+		case 1: color = Color.GREEN; break;
+		default: color = Color.RED; break;
+	}
+
+	switch (sideToUse) {
+		case 0: lifeform.genome.color.left = color; break;
+		default: lifeform.genome.color.right = color; break;
+	}
+	return
+}
+
+export function mutateMixColor(lifeform: Lifeform) {
+	const sideToUse = Math.floor(Math.random() * 3)
+
+	switch (sideToUse) {
+		case 0: lifeform.genome.mixColor.left = !lifeform.genome.mixColor.left; break;
+		default: lifeform.genome.mixColor.right = !lifeform.genome.mixColor.right; break;
+	}
+	return
+}
+

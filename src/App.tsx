@@ -4,7 +4,7 @@ import {
 	breed,
 	generateLifeforms,
 	getBackgroundColor,
-	Lifeform,
+	Lifeform, mutateLifeform,
 } from "./system/Lifeform.ts";
 import CssSetup from "./components/CssSetup.tsx";
 import Button from "./components/Button.tsx";
@@ -35,6 +35,9 @@ function App() {
 	const [selectedDiscovery, setSelectedDiscovery] = useState<Genome | null>(
 		null,
 	);
+
+	const [mutate, setMutate] = useState(true)
+	const [selectedChild, setSelectedChild] = useState<Lifeform | null>(null)
 
 	const snackBarCtx = useSnackbarContext();
 
@@ -174,6 +177,28 @@ function App() {
 		}
 	}
 
+	function handleMutateOnClick() {
+		if (mutate) {
+			snackBarCtx.displayMsg("You cannot mutate again this generation")
+			return
+		}
+
+		mutateLifeform(selectedChild);
+		return
+	}
+
+	function handleChildOnClick() {
+			if (selectedDiscovery === null) {
+				setSelectedChild(genome);
+				return;
+			} else if () {
+				setSelectedChild(null);
+				return;
+			} else {
+				setSelectedChild(child);
+			}
+	}
+
 	return (
 		<div>
 			<div className={"h-screen w-screen bg-black"}>
@@ -189,6 +214,7 @@ function App() {
 						the bottom. Try to get all the colors!
 					</p>
 					<span>Current Generation: {currentGeneration + 1}</span>
+					<span>Mutation: {mutate ? "available" : "not available"}</span>
 				</div>
 				<div className={"flex flex-col justify-center px-4"}>
 					<div className={"flex flex-col items-center gap-2 px-2 pb-2"}>
@@ -224,6 +250,7 @@ function App() {
 					<ChildrenSection
 						generations={generations}
 						currentGeneration={currentGeneration}
+						onClick={handleChildOnClick}
 					/>
 					<div
 						className={
@@ -233,6 +260,10 @@ function App() {
 						<Button
 							onClick={handlePreviousGeneration}
 							text={"Previous Generation"}
+						/>
+						<Button
+							onClick={handleMutateOnClick}
+							text={"Mutate"}
 						/>
 						<Button
 							onClick={handleNextGenerationOnClick}
