@@ -115,6 +115,7 @@ function App() {
 		setCurrentGeneration((prevState) => prevState + 1);
 		setFirstParent(null);
 		setSecondParent(null);
+		setSelectedChild(null);
 		setGenerations((prevState) => {
 			const nextGenCreation = prevState.map((g) => g.map((l) => l));
 			if (nextGenCreation[currentGeneration + 2] === undefined) {
@@ -135,6 +136,7 @@ function App() {
 		setCurrentGeneration((prevState) => prevState - 1);
 		setFirstParent(null);
 		setSecondParent(null);
+		setSelectedChild(null);
 	}
 
 	function handleDiscoveredNewColor(

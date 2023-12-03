@@ -121,29 +121,42 @@ export function mutateLifeform(lifeform: Lifeform) {
 }
 
 export function mutateColor(lifeform: Lifeform) {
-	const colorToUse = Math.floor(Math.random() * 3);
-	const sideToUse = Math.floor(Math.random() * 3);
-	let color = Color.RED;
+	let changedColor = false;
+	while (!changedColor) {
+		const colorToUse = Math.floor(Math.random() * 3);
+		const sideToUse = Math.floor(Math.random() * 3);
+		let color = Color.RED;
 
-	switch (colorToUse) {
-		case 0:
-			color = Color.BLUE;
-			break;
-		case 1:
-			color = Color.GREEN;
-			break;
-		default:
-			color = Color.RED;
-			break;
-	}
+		switch (colorToUse) {
+			case 0:
+				color = Color.BLUE;
+				break;
+			case 1:
+				color = Color.GREEN;
+				break;
+			default:
+				color = Color.RED;
+				break;
+		}
 
-	switch (sideToUse) {
-		case 0:
-			lifeform.genome.color.left = color;
-			break;
-		default:
-			lifeform.genome.color.right = color;
-			break;
+		switch (sideToUse) {
+			case 0:
+				if (color !== lifeform.genome.color.left) {
+					lifeform.genome.color.left = color;
+					changedColor = true;
+					break;
+				} else {
+					break;
+				}
+			default:
+				if (color !== lifeform.genome.color.right) {
+					lifeform.genome.color.right = color;
+					changedColor = true;
+					break;
+				} else {
+					break;
+				}
+		}
 	}
 	console.log(lifeform);
 	return;
