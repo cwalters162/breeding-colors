@@ -4,7 +4,8 @@ import {
 	breed,
 	generateLifeforms,
 	getBackgroundColor,
-	Lifeform, mutateLifeform,
+	Lifeform,
+	mutateLifeform,
 } from "./system/Lifeform.ts";
 import CssSetup from "./components/CssSetup.tsx";
 import Button from "./components/Button.tsx";
@@ -36,8 +37,8 @@ function App() {
 		null,
 	);
 
-	const [mutate, setMutate] = useState(true)
-	const [selectedChild, setSelectedChild] = useState<Lifeform | null>(null)
+	const [mutate, setMutate] = useState(true);
+	const [selectedChild, setSelectedChild] = useState<Lifeform | null>(null);
 
 	const snackBarCtx = useSnackbarContext();
 
@@ -118,6 +119,7 @@ function App() {
 			const nextGenCreation = prevState.map((g) => g.map((l) => l));
 			if (nextGenCreation[currentGeneration + 2] === undefined) {
 				nextGenCreation[currentGeneration + 2] = [];
+				setMutate(true);
 			}
 
 			return nextGenCreation;
@@ -178,27 +180,33 @@ function App() {
 	}
 
 	function handleMutateOnClick() {
-		if (mutate) {
-			snackBarCtx.displayMsg("You cannot mutate again this generation")
-			return
+		console.log("mutate");
+		if (!mutate) {
+			snackBarCtx.displayMsg("You cannot mutate again this generation");
+			return;
 		}
-
+		if (selectedChild == null) {
+			snackBarCtx.displayMsg("You must select a child first");
+			return;
+		}
 		mutateLifeform(selectedChild);
-		return
+		setMutate(false);
+		return;
 	}
 
-	function handleChildOnClick() {
-			if (selectedDiscovery === null) {
-				setSelectedChild(genome);
-				return;
-			} else if () {
-				setSelectedChild(null);
-				return;
-			} else {
-				setSelectedChild(child);
-			}
+	function handleChildOnClick(child: Lifeform) {
+		if (selectedChild === null) {
+			setSelectedChild(child);
+			return;
+		} else if (child === selectedChild) {
+			setSelectedChild(null);
+			return;
+		} else {
+			setSelectedChild(child);
+		}
 	}
 
+	console.log(selectedChild);
 	return (
 		<div>
 			<div className={"h-screen w-screen bg-black"}>
@@ -251,6 +259,7 @@ function App() {
 						generations={generations}
 						currentGeneration={currentGeneration}
 						onClick={handleChildOnClick}
+						selectedChildId={selectedChild?.id}
 					/>
 					<div
 						className={
@@ -261,10 +270,7 @@ function App() {
 							onClick={handlePreviousGeneration}
 							text={"Previous Generation"}
 						/>
-						<Button
-							onClick={handleMutateOnClick}
-							text={"Mutate"}
-						/>
+						<Button onClick={handleMutateOnClick} text={"Mutate"} />
 						<Button
 							onClick={handleNextGenerationOnClick}
 							text={"Next Generation"}
@@ -277,7 +283,7 @@ function App() {
 							"flex flex-wrap justify-center p-2 text-center text-white"
 						}
 					>
-						Scroll down to see what combinations you have discovered!
+						Scroll down to see more!
 					</span>
 				</div>
 				{snackBarCtx.isDisplayed && (
